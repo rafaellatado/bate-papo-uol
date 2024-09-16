@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <div class="content-container">
+
+    <div class="content-transparency"></div>
+
+    <div class="content">
+      <header>
+        <img src="public/logo.png" alt="logo">
+        <button class="menu-button menu"><ion-icon name="people"></ion-icon></button>
+      </header>
+
+      <div class="default-buttons">
+        <p class="menu-title">Escolha um contato para enviar mensagem:</p>
+        <div class="to">
+          <div class="to first">
+
+            <div class="check-container">
+              <button onclick="messageToWhom(this, 'Todos')"><ion-icon name="people"></ion-icon></button>
+              <button onclick="messageToWhom(this, 'Todos')">Todos</button>
+            </div>
+
+            <ion-icon class="check-icon" name="checkmark-sharp"></ion-icon>
+
+          </div>
+
+  <!--    <div class="to">
+
+            <div class="check-container">
+              <button onclick="messageToWhom(this, user)"><ion-icon name="people"></ion-icon></button>
+              <button onclick="messageToWhom(this, user)">Todos</button>
+            </div>
+          
+            <ion-icon class="check-icon hidden-icon" name="checkmark-sharp"></ion-icon>
+          
+          </div> -->
+
+        </div>
+
+        <p class="menu-title-2">Escolha a visibilidade:</p>
+
+        <div class="public-or-private">
+
+          <div class="public-or-private first">
+
+            <div class="check-container">
+              <!-- <ion-icon name="lock-open"></ion-icon> -->
+              <button onclick="publicOrReserved(this, 'message')"><ion-icon name="lock-closed"></ion-icon></button>
+              <button onclick="publicOrReserved(this, 'message')">Público</button>
+            </div>
+
+            <ion-icon class="check-icon" name="checkmark-sharp"></ion-icon>
+
+          </div>
+
+          <div class="public-or-private second">
+
+            <div class="check-container">
+              <!-- <ion-icon name="lock-open"></ion-icon> -->
+              <button onclick="publicOrReserved(this, 'private_message')"><ion-icon name="lock-closed"></ion-icon></button>
+              <button onclick="publicOrReserved(this, 'private_message')">Reservadamente</button>
+            </div>
+
+            <ion-icon class="check-icon hidden-icon" name="checkmark-sharp"></ion-icon>
+
+          </div>
+        </div>
+      </div>
+    
+      <ul class="messagesContainer"></ul>
+    
+      <div class="rodape">
+        <form onsubmit="sendMessage(event)">
+          <div class="msg-box-container">
+            <input class="form-input" type="text" placeholder="Escreva aqui...">
+            <p class="p-below-msg-box">Enviando para Todos (público)</p>
+          </div>
+          <button type="submit"><ion-icon name="paper-plane-outline"></ion-icon></button>
+        </form> 
+      </div>
+    
+      <div class="buttonsMessageTo"></div>
+  
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script src="script.js"></script>
+  <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+  <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+</body>
+</html>
