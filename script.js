@@ -10,6 +10,7 @@ let publicOrReservedMsgPt = 'público';
 let hasScrolled = false;
 let isMenuOpen = false;
 let lastMessageTimestamp = '';
+const loader = document.querySelector('.loader');
 userLogin();
 
 /* Setup to hide the right menu when the user clicks elsewhere */
@@ -171,6 +172,97 @@ function getParticipants() {
 
 }
 
+function getMessages() {
+
+  function fetchMessages() {
+
+    axios.get(`https://mock-api.driven.com.br/api/v6/uol/messages/${apiCode}`)
+      .then((response) => {
+
+        /* Storing the previous last message timestamp */
+        const previousLastMessageTimestamp = lastMessageTimestamp;
+
+        /* Updating messages and messagesHistory */
+        messages = [];
+        document.querySelector('.messagesContainer').innerHTML = '';
+        for (i = 0; i < response.data.length; i++) {
+          const message = {
+            time: response.data[i].time,
+            from: response.data[i].from,
+            to: response.data[i].to,
+            text: response.data[i].text,
+            type: response.data[i].type
+          };
+          messages.push(message);
+          messagesHistory.push(message);
+        }
+
+        if (messagesHistory.length > 200) {
+          messagesHistory = messagesHistory.slice(-200);
+        }
+
+        /* Updating the last message timestamp */
+        if (messagesHistory.length > 0) {
+          lastMessageTimestamp = messagesHistory[messagesHistory.length - 1].time;
+        }
+
+        showMessages();
+
+        /* Checking if there are new messages and scroll if necessary */
+        if (previousLastMessageTimestamp !== lastMessageTimestamp) {
+          const lastMessage = document.querySelector('.messagesContainer li:last-child');
+          if (lastMessage) {
+            lastMessage.scrollIntoView();
+          }
+        }
+
+      }).catch((err) => {
+        console.error('getMessages error: ', err);
+      });
+  }
+
+  fetchMessages();
+  setInterval(fetchMessages, 3000);
+
+}
+
+function showMessages() {
+  
+  const ul = document.querySelector('.messagesContainer');
+  const header = document.querySelector('header');
+  const footer = document.querySelector('.footer');
+
+  ul.innerHTML = '';
+
+  let filteredMessages = messages.filter(message => 
+    message.type === 'message' || message.type === 'status' || 
+    (message.type === 'private_message' && (message.from === userName || message.to === userName))
+  );
+
+  for (let i = 0; i < filteredMessages.length; i++) {
+    const li = document.createElement('li');
+    li.innerHTML = `
+      <span style="color: black">${filteredMessages[i].time}</span> 
+      <strong>${filteredMessages[i].from}</strong> para 
+      <strong>${filteredMessages[i].to}: </strong>
+      ${filteredMessages[i].text}`;
+    
+    if (filteredMessages[i].type === 'status') {
+      li.className = 'status-msg';
+    } else if (filteredMessages[i].type === 'private_message') {
+      li.className = 'private-msg';
+    } else {
+      li.className = 'normal-msg';
+    }
+
+    ul.appendChild(li);
+  }
+
+  loader.classList.add('hidden');
+  footer.classList.remove('hidden');
+  header.classList.remove('hidden');
+}
+
 function messageToWhom(button, toWhom) {
 
   if (publicOrReservedMsg === 'private_message' && msgToWhom !== 'Todos' && toWhom === 'Todos') {
@@ -190,7 +282,7 @@ function messageToWhom(button, toWhom) {
       Enviando para ${msgToWhom} (${publicOrReservedMsgPt})
     `;
     
-    console.log('messageToWhom: ', msgToWhom);
+    /* console.log('messageToWhom: ', msgToWhom); */
 
     const parentOfParents = document.querySelector('.to:not(.first)');
     const previousCheckIcon = parentOfParents ? parentOfParents.querySelector('.check-icon:not(.hidden-icon)') : null;
@@ -243,86 +335,6 @@ function publicOrReserved(button, msg) {
     return;
   }
 } 
-
-function getMessages() {
-  function fetchMessages() {
-    axios.get(`https://mock-api.driven.com.br/api/v6/uol/messages/${apiCode}`)
-      .then((response) => {
-
-        /* Storing the previous last message timestamp */
-        const previousLastMessageTimestamp = lastMessageTimestamp;
-
-        /* Updating messages and messagesHistory */
-        messages = [];
-        document.querySelector('.messagesContainer').innerHTML = '';
-        for (i = 0; i < response.data.length; i++) {
-          const message = {
-            time: response.data[i].time,
-            from: response.data[i].from,
-            to: response.data[i].to,
-            text: response.data[i].text,
-            type: response.data[i].type
-          };
-          messages.push(message);
-          messagesHistory.push(message);
-        }
-
-        if (messagesHistory.length > 200) {
-          messagesHistory = messagesHistory.slice(-200);
-        }
-
-        /* Updating the last message timestamp */
-        if (messagesHistory.length > 0) {
-          lastMessageTimestamp = messagesHistory[messagesHistory.length - 1].time;
-        }
-
-        showMessages();
-
-        /* Checking if there are new messages and scroll if necessary */
-        if (previousLastMessageTimestamp !== lastMessageTimestamp) {
-          const lastMessage = document.querySelector('.messagesContainer li:last-child');
-          if (lastMessage) {
-            lastMessage.scrollIntoView();
-          }
-        }
-
-      }).catch((err) => {
-        console.error('getMessages error: ', err);
-      });
-  }
-
-  fetchMessages();
-  setInterval(fetchMessages, 3000);
-}
-
-function showMessages() {
-  const ul = document.querySelector('.messagesContainer');
-  ul.innerHTML = '';
-
-  let filteredMessages = messages.filter(message => 
-    message.type === 'message' || message.type === 'status' || 
-    (message.type === 'private_message' && (message.from === userName || message.to === userName))
-  );
-
-  for (let i = 0; i < filteredMessages.length; i++) {
-    const li = document.createElement('li');
-    li.innerHTML = `
-      <span style="color: black">${filteredMessages[i].time}</span> 
-      <strong>${filteredMessages[i].from}</strong> para 
-      <strong>${filteredMessages[i].to}: </strong>
-      ${filteredMessages[i].text}`;
-    
-    if (filteredMessages[i].type === 'status') {
-      li.className = 'status-msg';
-    } else if (filteredMessages[i].type === 'private_message') {
-      li.className = 'private-msg';
-    } else {
-      li.className = 'normal-msg';
-    }
-
-    ul.appendChild(li);
-  }
-}
 
 function sendMessage(e) {
   e.preventDefault();
